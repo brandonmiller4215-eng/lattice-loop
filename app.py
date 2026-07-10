@@ -178,17 +178,15 @@ if FREE_BETA_MODE:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 💳 System Royalty & Membership Hub")
 
-# Core Nationwide Database of Grassroots Collectives across distinct regional areas
 REGIONAL_MUTUAL_AID_INDEX = {
-    "100": ["NYC Mutual Aid Pot", "Ridgewood Mutual Aid Project", "Bed-Stuy Strong"],     # New York Hub
-    "900": ["LA Mutual Aid Network", "Ktown For All", "Food Not Bombs LA"],               # Los Angeles Hub
-    "606": ["Chicago Mutual Aid", "Brave Space Alliance", "Love Fridge Chicago"],         # Chicago Hub
-    "331": ["Miami Mutual Aid Network", "Buddy System MIA", "Food Not Bombs Miami"],       # Miami Hub
-    "787": ["Austin Mutual Aid", "ATX Free Fridge", "Grounded in Solidarity"],            # Austin Hub
-    "770": ["Houston Mutual Aid", "Freedge Houston", "Solidarity Houston"]                # Houston Hub
+    "100": ["NYC Mutual Aid Pot", "Ridgewood Mutual Aid Project", "Bed-Stuy Strong"],     
+    "900": ["LA Mutual Aid Network", "Ktown For All", "Food Not Bombs LA"],               
+    "606": ["Chicago Mutual Aid", "Brave Space Alliance", "Love Fridge Chicago"],         
+    "331": ["Miami Mutual Aid Network", "Buddy System MIA", "Food Not Bombs Miami"],       
+    "787": ["Austin Mutual Aid", "ATX Free Fridge", "Grounded in Solidarity"],            
+    "770": ["Houston Mutual Aid", "Freedge Houston", "Solidarity Houston"]                
 }
 
-# Generic base fallback default updated to 10001 (New York Core)
 active_zip = st.session_state.get("global_zip", "10001")
 user_prefix = active_zip[:3] if len(active_zip) >= 3 else "100"
 available_collectives = REGIONAL_MUTUAL_AID_INDEX.get(user_prefix, ["National Mutual Aid Disaster Relief Fund"])
@@ -204,6 +202,35 @@ if st.sidebar.button(button_label):
     st.session_state.retained_capital += platform_split
     st.session_state.charity_funds[chosen_aid_group] += charity_split
     st.sidebar.success("Membership activated on the local node grid!")
+
+# --- NEW DROPDOWN ENTRY FOR QR CODE AND COPYRIGHT INFORMATION ---
+st.sidebar.markdown("---")
+with st.sidebar.expander("🔗 Share Network Node & Matrix", expanded=False):
+    current_app_url = "https://streamlit.app"
+    try:
+        qr_code_generator = segno.make(current_app_url)
+        qr_buffer = io.BytesIO()
+        qr_code_generator.save(qr_buffer, kind="png", scale=4, dark="#15803d", light="#f3f4f1")
+        qr_buffer.seek(0)
+        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode()
+        
+        st.markdown(f'<div style="text-align: center;"><img src="data:image/png;base64,{qr_b64}" width="140" style="border-radius:8px; border: 1px solid #e2e4df;"></div>', unsafe_allow_html=True)
+        st.markdown(f"""
+        <div style="font-size: 0.8rem; margin-top: 10px;">
+        Scan to sync mobile devices instantly into this cluster.
+        <br><br>
+        <b>Endpoint:</b> <a href="{current_app_url}" target="_blank">{current_app_url}</a>
+        </div>
+        """, unsafe_allow_html=True)
+    except Exception as qr_error:
+        st.info("Dynamic key rendering skipped.")
+        
+    st.markdown(f"""
+    <div style="text-align: center; color: #7f8c8d; font-size: 0.75rem; border-top: 1px solid #e2e4df; margin-top: 15px; padding-top: 10px;">
+        <b>Lattice Loop Framework v1.4.2-Beta</b><br>
+        © {datetime.datetime.now().year} Lattice Systems.<br>Apache License 2.0.
+    </div>
+    """, unsafe_allow_html=True)
 
 # 5. MARKETPLACE DISPLAY & TRANSACTIONS
 # ==========================================
