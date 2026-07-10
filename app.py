@@ -223,6 +223,23 @@ with st.sidebar.expander("🔗 Share QR Code and Link", expanded=False):
         """, unsafe_allow_html=True)
     except Exception as qr_error:
         st.info("Dynamic key rendering skipped.")
+
+        st.sidebar.markdown("---")
+st.sidebar.markdown(f"""
+<div style="color: #7f8c8d; font-size: 0.72rem; line-height: 1.3; text-align: justify; padding: 0 5px;">
+    <b>LEGAL COMPLIANCE MATRIX & REGULATORY SAFE HARBORS</b><br><br>
+    <b>1. Platform Facilitator Safe Harbor:</b> This interface functions strictly as a decentralized communication matching index. Pursuant to state and federal product liability frameworks, this platform does not possess, handle, control, or pass title to any third-party physical supply assets or inventory resources listed herein. Strict liability claims under § 402A of the Restatement (Second) of Torts are solely the responsibility of independent vendor entities.
+    <br><br>
+    <b>2. Food Donation Immunity:</b> Peer-to-peer distribution of wholesome grocery assets conducted in good faith through this network is structured to qualify for maximum liability protection frameworks under the <i>Bill Emerson Good Samaritan Food Donation Act (42 U.S.C. § 1791)</i> and the <i>Food Donation Improvement Act</i>.
+    <br><br>
+    <hr style="margin: 8px 0; border-color: #e2e4df !important;">
+    <div style="text-align: center; font-weight: bold;">
+        🕸️ Lattice Loop Framework v1.4.2-Beta<br>
+        © {datetime.datetime.now().year} Lattice Decentralized Systems.<br>
+        Released under Apache License 2.0. All Rights Reserved.
+    </div>
+</div>
+""", unsafe_allow_html=True)
         
     st.markdown(f"""
     <div style="text-align: center; color: #7f8c8d; font-size: 0.75rem; border-top: 1px solid #e2e4df; margin-top: 15px; padding-top: 10px;">
