@@ -55,10 +55,7 @@ if "retained_capital" not in st.session_state:
     st.session_state.retained_capital = 0.0      
 
 if "charity_funds" not in st.session_state:
-    st.session_state.charity_funds = {            
-        "San Antonio Collective Care": 0.0,
-        "Mootual Aid SATX": 0.0,
-        "Community Fridge SATX": 0.0
+    st.session_state.charity_funds = {}
     }
 
 if "subscriber_count" not in st.session_state:
@@ -124,10 +121,30 @@ charity_split = 0.00 if FREE_BETA_MODE else (sub_cost * 0.50)
 if FREE_BETA_MODE:
     st.sidebar.info("🚀 **Alpha Beta Pass Active:** Platform access is completely free for early network nodes!")
 
-chosen_aid_group = st.sidebar.selectbox(
-    "Designated Mutual Aid Anchor:", 
-    ["San Antonio Collective Care", "Mootual Aid SATX", "Community Fridge SATX"]
-)
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 💳 System Royalty & Membership Hub")
+
+# Core Nationwide Database of True Unincorporated Grassroots Collectives
+REGIONAL_MUTUAL_AID_INDEX = {
+    "782": ["San Antonio Collective Care", "Mootual Aid SATX", "Community Fridge SATX"], # San Antonio Core
+    "787": ["Austin Mutual Aid", "ATX Free Fridge", "Grounded in Solidarity"],            # Austin Hub
+    "770": ["Houston Mutual Aid", "Freedge Houston", "Solidarity Houston"],               # Houston Hub
+    "100": ["NYC Mutual Aid Pot", "Ridgewood Mutual Aid Project", "Bed-Stuy Strong"],     # New York Hub
+    "606": ["Chicago Mutual Aid", "Brave Space Alliance", "Love Fridge Chicago"],         # Chicago Hub
+    "900": ["LA Mutual Aid Network", "Ktown For All", "Food Not Bombs LA"]                # Los Angeles Hub
+}
+
+# Read the first 3 digits of the user's ZIP code to locate their nearest metropolitan hub
+user_prefix = user_zip[:3] if 'user_zip' in locals() and len(user_zip) >= 3 else "782"
+
+# Pull the specific grassroots collectives for that region, default to standard if not listed
+available_collectives = REGIONAL_MUTUAL_AID_INDEX.get(user_prefix, ["National Mutual Aid Disaster Relief Fund"])
+
+chosen_aid_group = st.sidebar.selectbox("Designated Mutual Aid Anchor:", available_collectives)
+
+# Initialize the selected group into our tracking registry ledger if it isn't there yet
+if chosen_aid_group not in st.session_state.charity_funds:
+    st.session_state.charity_funds[chosen_aid_group] = 0.0
 
 button_label = f"Claim Free Beta Membership Pass" if FREE_BETA_MODE else f"Subscribe (${sub_cost:.2f}/mo)"
 
