@@ -56,8 +56,7 @@ if "retained_capital" not in st.session_state:
 
 if "charity_funds" not in st.session_state:
     st.session_state.charity_funds = {}
-    }
-
+    
 if "subscriber_count" not in st.session_state:
     st.session_state.subscriber_count = 0        
 
