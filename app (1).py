@@ -4,6 +4,9 @@ import base64
 from PIL import Image
 import io
 import datetime
+import json
+import os
+import segno  # PASTE THIS LINE HERE
 
 # 1. Page & Layout Optimization
 st.set_page_config(
