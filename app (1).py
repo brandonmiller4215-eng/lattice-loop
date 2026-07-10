@@ -155,16 +155,19 @@ else:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📲 Share the Local Loop")
 with st.sidebar.expander("Generate Network QR Code", expanded=False):
-    # This automatically processes the URL into clean web data codes securely
-    import urllib.parse
+    # This generates the image natively using pure code math
     app_url = "https://streamlit.app"
-    encoded_url = urllib.parse.quote_plus(app_url)
+    qr = segno.make_qr(app_url)
     
-    # Secure API request link
-    qr_api_url = f"https://qrserver.com{encoded_url}"
+    # Save code to a temporary memory buffer
+    buffer = io.BytesIO()
+    qr.save(buffer, kind="png", scale=5)
+    buffer.seek(0)
     
-    st.image(qr_api_url, caption="Scan to join this neighborhood node!", use_container_width=True)
+    # Display the clean image block straight onto your screen
+    st.image(buffer, caption="Scan to join this neighborhood node!", use_container_width=True)
     st.caption("✨ Tip: Take a screenshot of this QR code to print on local flyers or community board notes!")
+
     
 # 5. Interface Action Selector
 view_mode = st.radio(
