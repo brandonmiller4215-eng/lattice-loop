@@ -240,25 +240,6 @@ st.sidebar.markdown(f"""
     </div>
 </div>
 """, unsafe_allow_html=True)
-        
-    st.markdown(f"""
-    <div style="text-align: center; color: #7f8c8d; font-size: 0.75rem; border-top: 1px solid #e2e4df; margin-top: 15px; padding-top: 10px;">
-        <b>🕸️ Lattice Loop Framework v1.4.2-Beta</b><br>
-        © {datetime.datetime.now().year} Lattice Decentralized Systems.<br>
-        Distributed under Apache License 2.0.<br>
-        All Rights Reserved.
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.sidebar.markdown("---")
-st.sidebar.markdown(f"""
-<div style="text-align: center; color: #7f8c8d; font-size: 0.75rem; padding-top: 5px;">
-    <b>🕸️ Lattice Loop Framework v1.4.2-Beta</b><br>
-    © {datetime.datetime.now().year} Lattice Decentralized Systems.<br>
-    Distributed under Apache License 2.0.<br>
-    All Rights Reserved.
-</div>
-""", unsafe_allow_html=True)
 
 # 5. MARKETPLACE DISPLAY & TRANSACTIONS
 # ==========================================
