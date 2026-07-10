@@ -66,41 +66,28 @@ if "subscriber_count" not in st.session_state:
 
 FREE_BETA_MODE = True 
 
-# Global Coordinate Directory Mapping Index (Expandable for expansion nodes)
-ZIP_COORDINATE_DIRECTORY = {
-    # San Antonio Base Core
-    "78201": (29.4678, -98.5235), "78212": (29.4524, -98.4912), 
-    "78207": (29.4312, -98.5312), "78209": (29.4891, -98.4513),
-    # Austin Grid Expansion Samples
-    "78701": (30.2729, -97.7444), "78704": (30.2451, -97.7641),
-    # Houston Grid Expansion Samples
-    "77002": (29.7568, -95.3659), "77006": (29.7423, -95.3921),
-    # NY Grid Expansion Samples
-    "10001": (40.7501, -73.9963), "10011": (40.7420, -74.0011)
-}
+# 2.5 Nationwide Geo-Location Engine Initialization
+import pgeocode
+# Initializes a lightning-fast, offline database for all United States postal codes
+zip_database = pgeocode.GeoDistance('us')
 
-# The Haversine Formula: Great-Circle Navigation Distance Calculator Engine
 def calculate_distance(user_zip, item_zip):
     if user_zip == item_zip:
         return 0.0
         
-    if user_zip not in ZIP_COORDINATE_DIRECTORY or item_zip not in ZIP_COORDINATE_DIRECTORY:
-        return "Unknown Network Node Zone"
+    # Dynamically calculates the exact mileage using offline coordinate indexes
+    try:
+        distance_in_km = zip_database.query_postal_code(user_zip, item_zip)
         
-    lat1, lon1 = ZIP_COORDINATE_DIRECTORY[user_zip]
-    lat2, lon2 = ZIP_COORDINATE_DIRECTORY[item_zip]
-    
-    # Earth Radius multiplier in standard English Survey Miles
-    earth_radius_miles = 3958.8 
-    
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    
-    a = (math.sin(dlat / 2) ** 2 + 
-         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2)
-         
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    return round(earth_radius_miles * c, 1)
+        # If a user types a fake or broken zip code, handle it gracefully
+        if math.isnan(distance_in_km):
+            return "Unknown Node Zone"
+            
+        # Convert kilometers to standard English survey miles
+        distance_in_miles = distance_in_km * 0.621371
+        return round(distance_in_miles, 1)
+    except:
+        return "Network Grid Syncing..."
 
 def process_uploaded_image(uploaded_file):
     if uploaded_file is not None:
