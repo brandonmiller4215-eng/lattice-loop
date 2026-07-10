@@ -191,7 +191,7 @@ st.markdown("---")
 # 6. Controller Logic: Find Local Needs
 if view_mode == "Find Local Needs":
     st.subheader("🔍 Local Network Query")
-    user_zip = st.text_input("Enter Your Current ZIP Code Location", value="78201", max_chars=5).strip()
+    user_zip = st.text_input("Enter Your Current ZIP Code Location", value="78201", max_chars=5, key="global_zip").strip()
     
     col_search, col_cat = st.columns(2)
     with col_search:
