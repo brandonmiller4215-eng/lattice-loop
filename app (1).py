@@ -152,13 +152,12 @@ else:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📲 Share the Local Loop")
 with st.sidebar.expander("Generate Network QR Code", expanded=False):
-    # When deployed, replace this with your actual URL (e.g., https://streamlit.app)
+    # This automatically processes the URL into clean web data codes securely
+    import urllib.parse
     app_url = "https://streamlit.app"
+    encoded_url = urllib.parse.quote_plus(app_url)
     
-    # Safely format the URL string for an API transmission request
-    encoded_url = app_url.replace(":", "%3A").replace("/", "%2F")
-    
-    # Fetch a clean, dynamic QR code image from a secure open-source API grid
+    # Secure API request link
     qr_api_url = f"https://qrserver.com{encoded_url}"
     
     st.image(qr_api_url, caption="Scan to join this neighborhood node!", use_container_width=True)
