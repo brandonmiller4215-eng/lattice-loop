@@ -6,7 +6,8 @@ import io
 import datetime
 import json
 import os
-import segno  # PASTE THIS LINE HERE
+import segno
+import math
 
 # 1. Page & Layout Optimization
 st.set_page_config(
@@ -15,14 +16,10 @@ st.set_page_config(
     layout="centered"
 )
 
-import json
-import os
-
 # 2. State & Memory Hub Initialization (JSON Flat-File Database Version)
 DB_INVENTORY_PATH = "inventory_db.json"
 DB_MESSAGES_PATH = "messages_db.json"
 
-# Helper functions to handle permanent text-file writes and reads
 def load_json_db(file_path, default_data):
     if os.path.exists(file_path):
         try:
@@ -36,7 +33,6 @@ def save_json_db(file_path, data):
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
 
-# Define baseline mock datasets to seed empty networks automatically
 DEFAULT_INVENTORY = [
     {"id": 0, "seller": "Oak Street Collective", "item": "Organic Tomatoes", "category": "Food", "qty": 15, "price": 3.50, "zip": "78201", "image": None},
     {"id": 1, "seller": "Elena's Textiles", "item": "Handmade Wool Blanket", "category": "Goods", "qty": 3, "price": 65.00, "zip": "78201", "image": None},
@@ -49,7 +45,6 @@ DEFAULT_MESSAGES = [
     {"zip": "78212", "alias": "ToolShare_Alpha", "text": "Rototiller is cleaned, sanitized, and ready for pickup.", "time": "09:30"}
 ]
 
-# Pull data directly from disk files into memory stream
 if "local_inventory" not in st.session_state:
     st.session_state.local_inventory = load_json_db(DB_INVENTORY_PATH, DEFAULT_INVENTORY)
 
@@ -69,23 +64,43 @@ if "charity_funds" not in st.session_state:
 if "subscriber_count" not in st.session_state:
     st.session_state.subscriber_count = 0        
 
-# CONFIGURATION FLAG: Toggle to False to initiate payment simulation systems
-FREE_BETA_MODE = True
+FREE_BETA_MODE = True 
 
-# Spatial Distance Matrix
-ZIP_PROXIMITY_MATRIX = {
-    "78201": {"78201": 0.0, "78212": 2.1, "78207": 3.5, "78209": 4.8},
-    "78212": {"78201": 2.1, "78212": 0.0, "78207": 2.8, "78209": 3.1},
-    "78207": {"78201": 3.5, "78212": 2.8, "78207": 0.0, "78209": 5.9},
-    "78209": {"78201": 4.8, "78212": 3.1, "78207": 5.9, "78209": 0.0},
+# Global Coordinate Directory Mapping Index (Expandable for expansion nodes)
+ZIP_COORDINATE_DIRECTORY = {
+    # San Antonio Base Core
+    "78201": (29.4678, -98.5235), "78212": (29.4524, -98.4912), 
+    "78207": (29.4312, -98.5312), "78209": (29.4891, -98.4513),
+    # Austin Grid Expansion Samples
+    "78701": (30.2729, -97.7444), "78704": (30.2451, -97.7641),
+    # Houston Grid Expansion Samples
+    "77002": (29.7568, -95.3659), "77006": (29.7423, -95.3921),
+    # NY Grid Expansion Samples
+    "10001": (40.7501, -73.9963), "10011": (40.7420, -74.0011)
 }
 
+# The Haversine Formula: Great-Circle Navigation Distance Calculator Engine
 def calculate_distance(user_zip, item_zip):
     if user_zip == item_zip:
         return 0.0
-    if user_zip in ZIP_PROXIMITY_MATRIX and item_zip in ZIP_PROXIMITY_MATRIX[user_zip]:
-        return ZIP_PROXIMITY_MATRIX[user_zip][item_zip]
-    return "Out of Grid"
+        
+    if user_zip not in ZIP_COORDINATE_DIRECTORY or item_zip not in ZIP_COORDINATE_DIRECTORY:
+        return "Unknown Network Node Zone"
+        
+    lat1, lon1 = ZIP_COORDINATE_DIRECTORY[user_zip]
+    lat2, lon2 = ZIP_COORDINATE_DIRECTORY[item_zip]
+    
+    # Earth Radius multiplier in standard English Survey Miles
+    earth_radius_miles = 3958.8 
+    
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    
+    a = (math.sin(dlat / 2) ** 2 + 
+         math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon / 2) ** 2)
+         
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return round(earth_radius_miles * c, 1)
 
 def process_uploaded_image(uploaded_file):
     if uploaded_file is not None:
@@ -115,7 +130,6 @@ with st.sidebar.expander("Currency Calculator", expanded=False):
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 💳 System Royalty & Membership Hub")
 
-# Establish subscription values based on operational mode
 sub_cost = 0.00 if FREE_BETA_MODE else 5.00
 platform_split = 0.00 if FREE_BETA_MODE else (sub_cost * 0.50)
 charity_split = 0.00 if FREE_BETA_MODE else (sub_cost * 0.50)
@@ -132,8 +146,6 @@ button_label = f"Claim Free Beta Membership Pass" if FREE_BETA_MODE else f"Subsc
 
 if st.sidebar.button(button_label):
     st.session_state.subscriber_count += 1
-    
-    # Process the financial allocations based on mode
     st.session_state.retained_capital += platform_split
     st.session_state.charity_funds[chosen_aid_group] += charity_split
     
@@ -152,44 +164,18 @@ else:
     st.sidebar.markdown("#### 🛰️ Direct Grassroots Distributions (50%)")
     for group, total_amount in st.session_state.charity_funds.items():
         st.sidebar.write(f" * **{group}:** `${total_amount:.2f}`")
+
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 📲 Share the Local Loop")
 with st.sidebar.expander("Generate Network QR Code", expanded=False):
-    # This generates the image natively using pure code math
     app_url = "https://streamlit.app"
     qr = segno.make_qr(app_url)
-    
-    # Save code to a temporary memory buffer
     buffer = io.BytesIO()
     qr.save(buffer, kind="png", scale=5)
     buffer.seek(0)
-    
-    # Display the clean image block straight onto your screen
     st.image(buffer, caption="Scan to join this neighborhood node!", use_container_width=True)
-    st.caption("✨ Tip: Take a screenshot of this QR code to print on local flyers or community board notes!")
+    st.caption("✨ Tip: Take a screenshot of this QR code to print on local flyers!")
 
-    st.sidebar.markdown("---")
-st.sidebar.markdown("### ⚖️ Legal & Framework Governance")
-with st.sidebar.expander("Terms of Service & IP Protocol", expanded=False):
-    st.markdown("""
-    ### 1. Ownership of Platform & Execution
-    The **Lattice Loop** framework, including its specific Python code layout, custom session state routing architecture, automated 50/50 treasury split model, and visual user interface design, is the exclusive intellectual property of the platform creator. This specific execution is protected by international copyright laws. Any unauthorized cloning, redistribution, or derivation of this software layout for commercial use is strictly prohibited.
-    
-    ### 2. Marketplace & Peer-to-Peer Disclaimer
-    Lattice Loop acts solely as a decentralized directory and bulletin framework to foster local community resilience. 100% of marketplace transaction revenue goes directly to independent sellers. The platform:
-    * Does not process, handle, or guarantee physical product exchanges.
-    * Is not liable for the quality, safety, or legality of any items listed by autonomous nodes.
-    * Does not mediate user-to-user disputes. All trades are conducted entirely at the risk of the participating individuals.
-    
-    ### 3. Secure Message Wall & Privacy Protocol
-    The Neighborhood Broadcast Wall operates as a transient communication network utilizing temporary server memory (RAM). Users agree not to post illegal content, hate speech, or targeted harassment. The platform creator reserves the right to wipe the memory cache or block nodes violating community standards to maintain network safety.
-    
-    ### 4. Solidarity Treasury Rules
-    By initiating a subscription, nodes acknowledge that 50% of monthly maintenance dues are automatically routed directly to non-corporate grassroots mutual aid groups as a non-refundable contribution to community resilience.
-    
-    *© 2026 Lattice Loop. All rights reserved. Registered Prior Art established via public cryptographic deployment.*
-    """)
-    
 # 5. Interface Action Selector
 view_mode = st.radio(
     "Select System Action:", 
@@ -215,10 +201,9 @@ if view_mode == "Find Local Needs":
     
     for item in current_items:
         dist = calculate_distance(user_zip, item["zip"])
-        if dist != "Out of Grid" and dist <= 10.0:
-            item_copy = item.copy()
-            item_copy["distance"] = dist
-            filtered_items.append(item_copy)
+        item_copy = item.copy()
+        item_copy["distance"] = dist
+        filtered_items.append(item_copy)
             
     if category_filter != "All":
         filtered_items = [i for i in filtered_items if i["category"] == category_filter]
@@ -229,7 +214,10 @@ if view_mode == "Find Local Needs":
             if search_query in i["item"].lower() or search_query in i["seller"].lower()
         ]
         
-    filtered_items = sorted(filtered_items, key=lambda x: x["distance"] if isinstance(x["distance"], float) else 999)
+    filtered_items = sorted(
+        filtered_items, 
+        key=lambda x: x["distance"] if isinstance(x["distance"], (int, float)) else 99999
+    )
     
     if not filtered_items:
         st.info("No matching local supply nodes found within range.")
@@ -246,10 +234,14 @@ if view_mode == "Find Local Needs":
                 with col_info:
                     st.markdown(f"#### **{item['item']}**")
                     st.markdown(f"*By: {item['seller']}*")
+                    
                     if item["distance"] == 0.0:
                         st.markdown("📍 **Distance:** `Right in your immediate ZIP!`")
-                    else:
+                    elif isinstance(item["distance"], (int, float)):
                         st.markdown(f"📍 **Distance:** `{item['distance']} miles away`")
+                    else:
+                        st.markdown(f"📍 **Distance:** `{item['distance']}`")
+                        
                     st.markdown(f"Category: `{item['category']}` | **Price:** ${item['price']:.2f}")
                 with col_action:
                     st.write(f"Available: {item['qty']}") 
@@ -260,8 +252,8 @@ if view_mode == "Find Local Needs":
                             for original_item in st.session_state.local_inventory:
                                 if original_item["id"] == item["id"]:
                                     original_item["qty"] -= 1
-                            st.success(f"Acquired! 100% of revenue routed directly to {item['seller']}.")
                             save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
+                            st.success(f"Acquired! 100% of revenue routed directly to {item['seller']}.")
                             st.rerun()
                 st.markdown("---")
 
@@ -288,10 +280,10 @@ elif view_mode == "Register Local Supply":
                     "id": next_id, "seller": new_seller, "item": new_item, "category": new_cat,
                     "qty": int(new_qty), "price": float(new_price), "zip": new_zip, "image": base64_image
                 })
-                st.success(f"Successfully broadcasted {new_item}.")
                 save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
+                st.success(f"Successfully broadcasted {new_item}.")
                 st.rerun()
-                
+
 # 8. Controller Logic: Secure Community Wall
 elif view_mode == "Secure Community Wall":
     st.subheader("💬 Untraceable Neighborhood Broadcast Wall")
@@ -317,8 +309,8 @@ elif view_mode == "Secure Community Wall":
                     "text": msg_text,
                     "time": now_str
                 })
-                st.success("Transmission added to local RAM grid!")
                 save_json_db(DB_MESSAGES_PATH, st.session_state.secure_message_wall)
+                st.success("Transmission added to local RAM grid!")
                 st.rerun()
 
     st.markdown("### 🛰️ Live Grid Transmissions")
