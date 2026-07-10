@@ -168,6 +168,27 @@ with st.sidebar.expander("Generate Network QR Code", expanded=False):
     st.image(buffer, caption="Scan to join this neighborhood node!", use_container_width=True)
     st.caption("✨ Tip: Take a screenshot of this QR code to print on local flyers or community board notes!")
 
+    st.sidebar.markdown("---")
+st.sidebar.markdown("### ⚖️ Legal & Framework Governance")
+with st.sidebar.expander("Terms of Service & IP Protocol", expanded=False):
+    st.markdown("""
+    ### 1. Ownership of Platform & Execution
+    The **Lattice Loop** framework, including its specific Python code layout, custom session state routing architecture, automated 50/50 treasury split model, and visual user interface design, is the exclusive intellectual property of the platform creator. This specific execution is protected by international copyright laws. Any unauthorized cloning, redistribution, or derivation of this software layout for commercial use is strictly prohibited.
+    
+    ### 2. Marketplace & Peer-to-Peer Disclaimer
+    Lattice Loop acts solely as a decentralized directory and bulletin framework to foster local community resilience. 100% of marketplace transaction revenue goes directly to independent sellers. The platform:
+    * Does not process, handle, or guarantee physical product exchanges.
+    * Is not liable for the quality, safety, or legality of any items listed by autonomous nodes.
+    * Does not mediate user-to-user disputes. All trades are conducted entirely at the risk of the participating individuals.
+    
+    ### 3. Secure Message Wall & Privacy Protocol
+    The Neighborhood Broadcast Wall operates as a transient communication network utilizing temporary server memory (RAM). Users agree not to post illegal content, hate speech, or targeted harassment. The platform creator reserves the right to wipe the memory cache or block nodes violating community standards to maintain network safety.
+    
+    ### 4. Solidarity Treasury Rules
+    By initiating a subscription, nodes acknowledge that 50% of monthly maintenance dues are automatically routed directly to non-corporate grassroots mutual aid groups as a non-refundable contribution to community resilience.
+    
+    *© 2026 Lattice Loop. All rights reserved. Registered Prior Art established via public cryptographic deployment.*
+    """)
     
 # 5. Interface Action Selector
 view_mode = st.radio(
