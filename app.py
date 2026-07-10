@@ -15,27 +15,27 @@ st.set_page_config(
     page_icon="🕸️", 
     layout="centered"
 )
-# 1.5 Advanced Visual Theme Injection (Custom CSS Matrix)
+# 1.5 Advanced Visual Theme Injection (Fresh Community Theme)
 st.markdown("""
 <style>
-    /* Global Page Background & Workspace Typography */
+    /* Global Page Background & Clean Clean Typography */
     .stApp {
-        background-color: #0d0f12 !important;
-        color: #e2e8f0 !important;
+        background-color: #fcfbf9 !important; /* Soft warm ivory cream */
+        color: #2d312e !important;            /* Earthy charcoal text */
         font-family: 'Inter', -apple-system, sans-serif !important;
     }
     
     /* Top Main App Headers & Titles */
     h1, h2, h3, h4 {
-        color: #38bdf8 !important; /* Sleek Neon Blue Tint */
+        color: #15803d !important; /* Fresh organic emerald green */
         font-weight: 700 !important;
         letter-spacing: -0.025em !important;
     }
     
     /* Clean Sidebar Utility Optimization Layout */
     section[data-testid="stSidebar"] {
-        background-color: #11151c !important;
-        border-right: 1px solid #1e293b !important;
+        background-color: #f3f4f1 !important; /* Soft moss tint gray */
+        border-right: 1px solid #e2e4df !important;
     }
     
     /* Beautiful Custom Borders for Marketplace Container Cards */
@@ -45,26 +45,26 @@ st.markdown("""
     
     /* Premium Action Button Global Styles */
     .stButton>button {
-        background-color: #0284c7 !important; /* Sky Blue Base */
+        background-color: #16a34a !important; /* Bright lively green */
         color: #ffffff !important;
         font-weight: 600 !important;
         border-radius: 8px !important;
         border: none !important;
         transition: all 0.2s ease-in-out !important;
         width: 100% !important;
-        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05) !important;
     }
     
     /* Interactive Hover State for Active Buttons */
     .stButton>button:hover {
-        background-color: #0369a1 !important; /* Deeper Cyan Highlight */
+        background-color: #15803d !important; /* Richer forest emerald */
         transform: translateY(-1px) !important;
-        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3) !important;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1) !important;
     }
     
     /* Horizontal Dividers Design Matrix */
     hr {
-        border-color: #1e293b !important;
+        border-color: #e2e4df !important;
     }
 </style>
 """, unsafe_allow_html=True)
