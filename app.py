@@ -376,7 +376,7 @@ with col_right:
             save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
             st.success("Resource successfully mapped onto the regional grid!")
             st.rerun()
-                st.markdown("---")
+            st.markdown("---")
 
 # 7. Controller Logic: Register Local Supply
 elif view_mode == "Register Local Supply":
