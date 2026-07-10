@@ -13,7 +13,7 @@ import math
 # 1. PAGE & LAYOUT OPTIMIZATION
 # ==========================================
 st.set_page_config(
-    page_title="Lattice: Grand Exchange Loop", 
+    page_title="Lattice: Local Exchange Loop", 
     page_icon="🕸️", 
     layout="centered"
 )
@@ -91,7 +91,6 @@ def save_json_db(file_path, data):
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
 
-# Updated default setup to distribute nodes nationwide across the US
 DEFAULT_INVENTORY = [
     {"id": 0, "seller": "East Coast Collective", "item": "Organic Heirloom Produce", "category": "Food", "qty": 15, "price": 3.50, "zip": "10001", "image": None},
     {"id": 1, "seller": "Elena's West Coast Textiles", "item": "Handmade Wool Blanket", "category": "Goods", "qty": 3, "price": 65.00, "zip": "90210", "image": None},
@@ -203,9 +202,9 @@ if st.sidebar.button(button_label):
     st.session_state.charity_funds[chosen_aid_group] += charity_split
     st.sidebar.success("Membership activated on the local node grid!")
 
-# --- NEW DROPDOWN ENTRY FOR QR CODE AND COPYRIGHT INFORMATION ---
+# Dedicated Sidebar Dropdown container holding QR code link and system attributions
 st.sidebar.markdown("---")
-with st.sidebar.expander("🔗 Share Network Node & Matrix", expanded=False):
+with st.sidebar.expander("🔗 Share QR Code and Link", expanded=False):
     current_app_url = "https://streamlit.app"
     try:
         qr_code_generator = segno.make(current_app_url)
@@ -216,10 +215,10 @@ with st.sidebar.expander("🔗 Share Network Node & Matrix", expanded=False):
         
         st.markdown(f'<div style="text-align: center;"><img src="data:image/png;base64,{qr_b64}" width="140" style="border-radius:8px; border: 1px solid #e2e4df;"></div>', unsafe_allow_html=True)
         st.markdown(f"""
-        <div style="font-size: 0.8rem; margin-top: 10px;">
+        <div style="font-size: 0.8rem; margin-top: 10px; text-align: center; color: #2d312e;">
         Scan to sync mobile devices instantly into this cluster.
         <br><br>
-        <b>Endpoint:</b> <a href="{current_app_url}" target="_blank">{current_app_url}</a>
+        <b>Lattice Hub Endpoint:</b><br><a href="{current_app_url}" target="_blank">{current_app_url}</a>
         </div>
         """, unsafe_allow_html=True)
     except Exception as qr_error:
@@ -227,8 +226,10 @@ with st.sidebar.expander("🔗 Share Network Node & Matrix", expanded=False):
         
     st.markdown(f"""
     <div style="text-align: center; color: #7f8c8d; font-size: 0.75rem; border-top: 1px solid #e2e4df; margin-top: 15px; padding-top: 10px;">
-        <b>Lattice Loop Framework v1.4.2-Beta</b><br>
-        © {datetime.datetime.now().year} Lattice Systems.<br>Apache License 2.0.
+        <b>🕸️ Lattice Loop Framework v1.4.2-Beta</b><br>
+        © {datetime.datetime.now().year} Lattice Decentralized Systems.<br>
+        Distributed under Apache License 2.0.<br>
+        All Rights Reserved.
     </div>
     """, unsafe_allow_html=True)
 
