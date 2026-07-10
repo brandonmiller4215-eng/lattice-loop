@@ -242,76 +242,140 @@ view_mode = st.radio(
 
 st.markdown("---")
 
-# 6. Controller Logic: Find Local Needs
-if view_mode == "Find Local Needs":
-    st.subheader("🔍 Local Network Query")
-    user_zip = st.text_input("Enter Your Current ZIP Code Location", value="78201", max_chars=5, key="global_zip").strip()
-    
-    col_search, col_cat = st.columns(2)
-    with col_search:
-        search_query = st.text_input("Search items by keyword...", value="").strip().lower()
-    with col_cat:
-        category_filter = st.selectbox("Category Filter", ["All", "Food", "Goods", "Tools", "Services"])
-    
-    current_items = st.session_state.local_inventory
-    filtered_items = []
-    
-    for item in current_items:
-        dist = calculate_distance(user_zip, item["zip"])
-        item_copy = item.copy()
-        item_copy["distance"] = dist
-        filtered_items.append(item_copy)
+# 5. MARKETPLACE DISPLAY & TRANSACTIONS
+# ==========================================
+
+# Simple form to allow users to set their global viewing ZIP code
+st.subheader("📍 Your Node Location")
+col_zip1, col_zip2 = st.columns([2, 5])
+with col_zip1:
+    user_zip = st.text_input("Enter Your ZIP Code:", value="78201", max_chars=5, key="global_zip")
+
+with col_zip2:
+    st.write("") # Spacer to alignment
+    st.markdown(f"**Connected Hub:** `{user_zip[:3]}...` | **Mutual Aid Anchor:** `{chosen_aid_group}`")
+
+st.markdown("---")
+st.subheader("🛒 Local Decentralized Inventory")
+
+# Read database values into an accessible grid
+if not st.session_state.local_inventory:
+    st.info("The local supply chain loop is currently empty. Be the first to list an item!")
+else:
+    for idx, item in enumerate(st.session_state.local_inventory):
+        # Calculate distance on-the-fly using your pgeocode engine
+        distance = calculate_distance(user_zip, item["zip"])
+        dist_str = f"📍 {distance} miles away" if isinstance(distance, (int, float)) else f"🛑 {distance}"
+        
+        # Unique visual layout container card for each marketplace item
+        with st.container():
+            col_img, col_details, col_actions = st.columns([2, 4, 3])
             
-    if category_filter != "All":
-        filtered_items = [i for i in filtered_items if i["category"] == category_filter]
-        
-    if search_query:
-        filtered_items = [
-            i for i in filtered_items 
-            if search_query in i["item"].lower() or search_query in i["seller"].lower()
-        ]
-        
-    filtered_items = sorted(
-        filtered_items, 
-        key=lambda x: x["distance"] if isinstance(x["distance"], (int, float)) else 99999
-    )
-    
-    if not filtered_items:
-        st.info("No matching local supply nodes found within range.")
-    else:
-        st.write(f"### Matching Options ({len(filtered_items)} found):")
-        for item in filtered_items:
-            with st.container():
-                col_img, col_info, col_action = st.columns(3)
-                with col_img:
-                    if item.get("image"):
-                        st.image(item["image"], use_column_width=True)
-                    else:
-                        st.markdown("🖼️\n*(No Image)*")
-                with col_info:
-                    st.markdown(f"#### **{item['item']}**")
-                    st.markdown(f"*By: {item['seller']}*")
+            with col_img:
+                if item.get("image"):
+                    st.image(item["image"], use_column_width=True)
+                else:
+                    # Aesthetic text fallback placeholder icon based on category
+                    icon = "🍎" if item["category"] == "Food" else "🧵" if item["category"] == "Goods" else "🛠️"
+                    st.markdown(f"<h1 style='text-align: center; font-size: 4rem; margin:0;'>{icon}</h1>", unsafe_allow_html=True)
+            
+            with col_details:
+                st.markdown(f"### {item['item']}")
+                st.markdown(f"**Seller:** `{item['seller']}` | {dist_str}")
+                st.markdown(f"**Available Quantity:** `{item['qty']}` units")
+                
+                # Show pricing metrics calculated across your valuation models
+                st.markdown(f"💰 **Value Matrix:** `${item['price']:.2f} USD` | `{(item['price']/20.0):.2f} Hrs` | `{(item['price']/1.50):.1f} LTC`")
+            
+            with col_actions:
+                st.write("✨ **Select Checkout Framework:**")
+                
+                # OPTION 1: Peer-to-Peer Peer Barter / Cash on Delivery
+                trade_btn = st.button(f"🤝 Request P2P Barter", key=f"barter_{item['id']}")
+                
+                # OPTION 2: Secure Electronic USD Card Checkout via Stripe Hosted link
+                stripe_url = f"https://stripe.com_{item['id']}" 
+                st.markdown(f"""
+                    <a href="{stripe_url}" target="_blank" style="text-decoration: none;">
+                        <button style="
+                            background-color: #15803d; 
+                            color: white; 
+                            border: none; 
+                            padding: 8px 16px; 
+                            border-radius: 8px; 
+                            font-weight: 600; 
+                            width: 100%; 
+                            cursor: pointer;
+                            margin-top: 5px;
+                            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+                        ">💳 Pay with Card (USD)</button>
+                    </a>
+                """, unsafe_allow_html=True)
+            
+            # --- BACKEND TRANSACTION PROCESSOR ---
+            if trade_btn:
+                if item["qty"] > 0:
+                    # 1. Deduct one item from the active localized stock loop
+                    st.session_state.local_inventory[idx]["qty"] -= 1
                     
-                    if item["distance"] == 0.0:
-                        st.markdown("📍 **Distance:** `Right in your immediate ZIP!`")
-                    elif isinstance(item["distance"], (int, float)):
-                        st.markdown(f"📍 **Distance:** `{item['distance']} miles away`")
-                    else:
-                        st.markdown(f"📍 **Distance:** `{item['distance']}`")
-                        
-                    st.markdown(f"Category: `{item['category']}` | **Price:** ${item['price']:.2f}")
-                with col_action:
-                    st.write(f"Available: {item['qty']}") 
-                    if item["qty"] <= 0:
-                        st.button("Sold Out", key=f"dead_{item['id']}", disabled=True)
-                    else:
-                        if st.button(f"Acquire", key=f"buy_{item['id']}"):
-                            for original_item in st.session_state.local_inventory:
-                                if original_item["id"] == item["id"]:
-                                    original_item["qty"] -= 1
-                            save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
-                            st.success(f"Acquired! 100% of revenue routed directly to {item['seller']}.")
-                            st.rerun()
+                    # 2. Append an automated alert sequence to your Message Wall log
+                    timestamp = datetime.datetime.now().strftime("%H:%M")
+                    new_msg = {
+                        "zip": user_zip,
+                        "alias": f"Node_{user_zip}",
+                        "text": f"🚨 TRANSACTION: Requested 1x '{item['item']}' from {item['seller']} via local barter channel.",
+                        "time": timestamp
+                    }
+                    st.session_state.secure_message_wall.insert(0, new_msg)
+                    
+                    # 3. Commit state changes seamlessly to your hard JSON flat-file database
+                    save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
+                    save_json_db(DB_MESSAGES_PATH, st.session_state.secure_message_wall)
+                    
+                    st.success(f"🎉 Order requested! Coordination logs broadcasted to the Secure Message Wall.")
+                    st.rerun()
+                else:
+                    st.error("Out of stock! This local supply loop loop is depleted.")
+                    
+        st.markdown("<hr style='margin: 1em 0; border-style: dashed;'>", unsafe_allow_html=True)
+
+# ==========================================
+# 6. LOCAL COMMUNICATION WALL & LISTING FORM
+# ==========================================
+st.write("")
+col_left, col_right = st.columns(2)
+
+with col_left:
+    st.subheader("💬 Active Network Message Wall")
+    for msg in st.session_state.secure_message_wall[:5]: # Cap at latest 5 messages for clean layout
+        st.markdown(f"**[{msg['time']}] {msg['alias']} (Hub {msg['zip']}):** {msg['text']}")
+
+with col_right:
+    st.subheader("🌱 Inject Supply to Loop")
+    with st.form("new_item_form", clear_on_submit=True):
+        new_seller = st.text_input("Producer / Seller Alias:")
+        new_title = st.text_input("Item or Resource Name:")
+        new_cat = st.selectbox("Category:", ["Food", "Goods", "Tools", "Services"])
+        col_f1, col_f2, col_f3 = st.columns(3)
+        with col_f1: new_qty = st.number_input("Qty:", min_value=1, value=1)
+        with col_f2: new_price = st.number_input("Price ($):", min_value=0.0, value=1.0)
+        with col_f3: new_zip = st.text_input("ZIP:", value=user_zip, max_chars=5)
+        new_img_file = st.file_uploader("Upload Image:", type=["jpg", "png", "jpeg"])
+        
+        submit_listing = st.form_submit_form_button("Broadcast to Lattice")
+        
+        if submit_listing and new_seller and new_title:
+            b64_img = process_uploaded_image(new_img_file)
+            new_id = len(st.session_state.local_inventory)
+            new_node = {
+                "id": new_id, "seller": new_seller, "item": new_title, 
+                "category": new_cat, "qty": new_qty, "price": new_price, 
+                "zip": new_zip, "image": b64_img
+            }
+            st.session_state.local_inventory.append(new_node)
+            save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
+            st.success("Resource successfully mapped onto the regional grid!")
+            st.rerun()
                 st.markdown("---")
 
 # 7. Controller Logic: Register Local Supply
