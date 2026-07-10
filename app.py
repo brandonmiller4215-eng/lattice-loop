@@ -243,7 +243,7 @@ st.sidebar.markdown(f"""
 
 # 5. MARKETPLACE DISPLAY & TRANSACTIONS
 # ==========================================
-st.subheader("📍 Your Node Location")
+st.subheader("📍 Your Location")
 col_zip1, col_zip2 = st.columns(2)
 with col_zip1:
     # Changed generic placeholder default state entry from 78201 to 10001
