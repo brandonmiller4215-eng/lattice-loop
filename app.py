@@ -233,6 +233,16 @@ with st.sidebar.expander("🔗 Share QR Code and Link", expanded=False):
     </div>
     """, unsafe_allow_html=True)
 
+    st.sidebar.markdown("---")
+st.sidebar.markdown(f"""
+<div style="text-align: center; color: #7f8c8d; font-size: 0.75rem; padding-top: 5px;">
+    <b>🕸️ Lattice Loop Framework v1.4.2-Beta</b><br>
+    © {datetime.datetime.now().year} Lattice Decentralized Systems.<br>
+    Distributed under Apache License 2.0.<br>
+    All Rights Reserved.
+</div>
+""", unsafe_allow_html=True)
+
 # 5. MARKETPLACE DISPLAY & TRANSACTIONS
 # ==========================================
 st.subheader("📍 Your Node Location")
