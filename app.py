@@ -13,7 +13,7 @@ import math
 # 1. PAGE & LAYOUT OPTIMIZATION
 # ==========================================
 st.set_page_config(
-    page_title="Lattice: Local Exchange Loop", 
+    page_title="Lattice: Grand Exchange Loop", 
     page_icon="🕸️", 
     layout="centered"
 )
@@ -91,16 +91,17 @@ def save_json_db(file_path, data):
     with open(file_path, "w") as f:
         json.dump(data, f, indent=4)
 
+# Updated default setup to distribute nodes nationwide across the US
 DEFAULT_INVENTORY = [
-    {"id": 0, "seller": "Oak Street Collective", "item": "Organic Tomatoes", "category": "Food", "qty": 15, "price": 3.50, "zip": "78201", "image": None},
-    {"id": 1, "seller": "Elena's Textiles", "item": "Handmade Wool Blanket", "category": "Goods", "qty": 3, "price": 65.00, "zip": "78201", "image": None},
-    {"id": 2, "seller": "Community Tool Library", "item": "Rototiller Rental", "category": "Tools", "qty": 1, "price": 10.00, "zip": "78212", "image": None},
-    {"id": 3, "seller": "Mendoza Farm", "item": "Free-Range Eggs (Dozen)", "category": "Food", "qty": 12, "price": 5.00, "zip": "78212", "image": None},
+    {"id": 0, "seller": "East Coast Collective", "item": "Organic Heirloom Produce", "category": "Food", "qty": 15, "price": 3.50, "zip": "10001", "image": None},
+    {"id": 1, "seller": "Elena's West Coast Textiles", "item": "Handmade Wool Blanket", "category": "Goods", "qty": 3, "price": 65.00, "zip": "90210", "image": None},
+    {"id": 2, "seller": "Midwest Tool Share Network", "item": "Rototiller Rental", "category": "Tools", "qty": 1, "price": 10.00, "zip": "60601", "image": None},
+    {"id": 3, "seller": "Sunshine Farm Guild", "item": "Free-Range Eggs (Dozen)", "category": "Food", "qty": 12, "price": 5.00, "zip": "33101", "image": None},
 ]
 
 DEFAULT_MESSAGES = [
-    {"zip": "78201", "alias": "AnonNode_1", "text": "Leaving seeds at the community box on Main St at noon.", "time": "10:15"},
-    {"zip": "78212", "alias": "ToolShare_Alpha", "text": "Rototiller is cleaned, sanitized, and ready for pickup.", "time": "09:30"}
+    {"zip": "10001", "alias": "AnonNode_NYC", "text": "Leaving non-gmo seeds at the community box on Main St at noon.", "time": "10:15"},
+    {"zip": "60601", "alias": "ToolShare_Midwest", "text": "Rototiller machinery is cleaned, sanitized, and ready for grid checkout.", "time": "09:30"}
 ]
 
 if "local_inventory" not in st.session_state:
@@ -177,17 +178,19 @@ if FREE_BETA_MODE:
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 💳 System Royalty & Membership Hub")
 
+# Core Nationwide Database of Grassroots Collectives across distinct regional areas
 REGIONAL_MUTUAL_AID_INDEX = {
-    "782": ["San Antonio Collective Care", "Mootual Aid SATX", "Community Fridge SATX"], 
-    "787": ["Austin Mutual Aid", "ATX Free Fridge", "Grounded in Solidarity"],            
-    "770": ["Houston Mutual Aid", "Freedge Houston", "Solidarity Houston"],               
-    "100": ["NYC Mutual Aid Pot", "Ridgewood Mutual Aid Project", "Bed-Stuy Strong"],     
-    "606": ["Chicago Mutual Aid", "Brave Space Alliance", "Love Fridge Chicago"],         
-    "900": ["LA Mutual Aid Network", "Ktown For All", "Food Not Bombs LA"]                
+    "100": ["NYC Mutual Aid Pot", "Ridgewood Mutual Aid Project", "Bed-Stuy Strong"],     # New York Hub
+    "900": ["LA Mutual Aid Network", "Ktown For All", "Food Not Bombs LA"],               # Los Angeles Hub
+    "606": ["Chicago Mutual Aid", "Brave Space Alliance", "Love Fridge Chicago"],         # Chicago Hub
+    "331": ["Miami Mutual Aid Network", "Buddy System MIA", "Food Not Bombs Miami"],       # Miami Hub
+    "787": ["Austin Mutual Aid", "ATX Free Fridge", "Grounded in Solidarity"],            # Austin Hub
+    "770": ["Houston Mutual Aid", "Freedge Houston", "Solidarity Houston"]                # Houston Hub
 }
 
-active_zip = st.session_state.get("global_zip", "78201")
-user_prefix = active_zip[:3] if len(active_zip) >= 3 else "782"
+# Generic base fallback default updated to 10001 (New York Core)
+active_zip = st.session_state.get("global_zip", "10001")
+user_prefix = active_zip[:3] if len(active_zip) >= 3 else "100"
 available_collectives = REGIONAL_MUTUAL_AID_INDEX.get(user_prefix, ["National Mutual Aid Disaster Relief Fund"])
 chosen_aid_group = st.sidebar.selectbox("Designated Mutual Aid Anchor:", available_collectives)
 
@@ -204,6 +207,17 @@ if st.sidebar.button(button_label):
 
 # 5. MARKETPLACE DISPLAY & TRANSACTIONS
 # ==========================================
+st.subheader("📍 Your Node Location")
+col_zip1, col_zip2 = st.columns(2)
+with col_zip1:
+    # Changed generic placeholder default state entry from 78201 to 10001
+    user_zip = st.text_input("Enter Your ZIP Code:", value="10001", max_chars=5, key="global_zip")
+
+with col_zip2:
+    st.write("") 
+    st.markdown(f"**Connected Hub:** `{user_zip[:3]}...` | **Mutual Aid Anchor:** `{chosen_aid_group}`")
+
+st.markdown("---")
 st.subheader("🛒 Local Decentralized Inventory")
 
 if not st.session_state.local_inventory:
