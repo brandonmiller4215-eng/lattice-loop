@@ -204,16 +204,6 @@ if st.sidebar.button(button_label):
 
 # 5. MARKETPLACE DISPLAY & TRANSACTIONS
 # ==========================================
-st.subheader("📍 Your Node Location")
-col_zip1, col_zip2 = st.columns(2)
-with col_zip1:
-    user_zip = st.text_input("Enter Your ZIP Code:", value="78201", max_chars=5, key="global_zip")
-
-with col_zip2:
-    st.write("") 
-    st.markdown(f"**Connected Hub:** `{user_zip[:3]}...` | **Mutual Aid Anchor:** `{chosen_aid_group}`")
-
-st.markdown("---")
 st.subheader("🛒 Local Decentralized Inventory")
 
 if not st.session_state.local_inventory:
@@ -344,7 +334,7 @@ with st.expander("🔎 View Complete Multi-Hub Ledger Matrix", expanded=False):
         st.info("No active mutual aid allocations recorded in this session loop yet.")
 
 # ==========================================
-# 8. DECENTRALIZED NODE AUTHENTICATION LINK (QR CODE)
+# 8. DECENTRALIZED NODE AUTHENTICATION LINK & COPYRIGHTS
 # ==========================================
 st.markdown("---")
 st.subheader("🔗 Node Link & Shareable Network Matrix")
@@ -371,3 +361,12 @@ try:
         st.markdown(f'<img src="data:image/png;base64,{qr_b64}" width="150" style="border-radius:8px; border: 1px solid #e2e4df;">', unsafe_allow_html=True)
 except Exception as qr_error:
     st.info("Generating dynamic QR access node links... Plug in Segno dependency framework.")
+
+# Clean persistent layout footer mapping out legal structures and version tracking
+st.markdown("---")
+st.markdown(f"""
+<div style="text-align: center; color: #7f8c8d; font-size: 0.85rem; margin-top: 20px;">
+    <p>🕸️ <b>Lattice Loop Framework v1.4.2-Beta</b></p>
+    <p>© {datetime.datetime.now().year} Lattice Decentralized Systems. Distributed under the Apache License 2.0. Open-source local infrastructure.</p>
+</div>
+""", unsafe_allow_html=True)
