@@ -370,4 +370,4 @@ try:
     with col_qr_img:
         st.markdown(f'<img src="data:image/png;base64,{qr_b64}" width="150" style="border-radius:8px; border: 1px solid #e2e4df;">', unsafe_allow_html=True)
 except Exception as qr_error:
-    st.info("Generating dynamic QR access node links... Plug in Segno 
+    st.info("Generating dynamic QR access node links... Plug in Segno) 
