@@ -383,40 +383,4 @@ with st.expander("🔎 View Complete Multi-Hub Ledger Matrix", expanded=False):
     else:
         st.info("No active mutual aid allocations recorded in this session loop yet.")
 
-# ==========================================
-# 8. DECENTRALIZED NODE AUTHENTICATION LINK & COPYRIGHTS
-# ==========================================
-st.markdown("---")
-st.subheader("🔗 Node Link & Shareable Network Matrix")
 
-current_app_url = "https://streamlit.app"
-
-try:
-    qr_code_generator = segno.make(current_app_url)
-    qr_buffer = io.BytesIO()
-    qr_code_generator.save(qr_buffer, kind="png", scale=4, dark="#15803d", light="#fcfbf9")
-    qr_buffer.seek(0)
-    qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode()
-    
-    col_qr_text, col_qr_img = st.columns()
-    with col_qr_text:
-        st.write("")
-        st.markdown(f"""
-        Neighbors can scan this direct secure access key with their mobile phone cameras to sync instantly into this grid location loop **(Hub {user_zip[:3]})**.
-        
-        *   **App Endpoint:** `{current_app_url}`
-        *   **Active Target Grid:** Unincorporated Local Nodes
-        """)
-    with col_qr_img:
-        st.markdown(f'<img src="data:image/png;base64,{qr_b64}" width="150" style="border-radius:8px; border: 1px solid #e2e4df;">', unsafe_allow_html=True)
-except Exception as qr_error:
-    st.info("Generating dynamic QR access node links... Plug in Segno dependency framework.")
-
-# Clean persistent layout footer mapping out legal structures and version tracking
-st.markdown("---")
-st.markdown(f"""
-<div style="text-align: center; color: #7f8c8d; font-size: 0.85rem; margin-top: 20px;">
-    <p>🕸️ <b>Lattice Loop Framework v1.4.2-Beta</b></p>
-    <p>© {datetime.datetime.now().year} Lattice Decentralized Systems. Distributed under the Apache License 2.0. Open-source local infrastructure.</p>
-</div>
-""", unsafe_allow_html=True)
