@@ -134,7 +134,8 @@ REGIONAL_MUTUAL_AID_INDEX = {
 }
 
 # Read the first 3 digits of the user's ZIP code to locate their nearest metropolitan hub
-user_prefix = user_zip[:3] if 'user_zip' in locals() and len(user_zip) >= 3 else "782"
+active_zip = st.session_state.get("global_zip", "78201")
+user_prefix = active_zip[:3] if len(active_zip) >= 3 else "782"
 
 # Pull the specific grassroots collectives for that region, default to standard if not listed
 available_collectives = REGIONAL_MUTUAL_AID_INDEX.get(user_prefix, ["National Mutual Aid Disaster Relief Fund"])
