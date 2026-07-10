@@ -15,6 +15,59 @@ st.set_page_config(
     page_icon="🕸️", 
     layout="centered"
 )
+# 1.5 Advanced Visual Theme Injection (Custom CSS Matrix)
+st.markdown("""
+<style>
+    /* Global Page Background & Workspace Typography */
+    .stApp {
+        background-color: #0d0f12 !important;
+        color: #e2e8f0 !important;
+        font-family: 'Inter', -apple-system, sans-serif !important;
+    }
+    
+    /* Top Main App Headers & Titles */
+    h1, h2, h3, h4 {
+        color: #38bdf8 !important; /* Sleek Neon Blue Tint */
+        font-weight: 700 !important;
+        letter-spacing: -0.025em !important;
+    }
+    
+    /* Clean Sidebar Utility Optimization Layout */
+    section[data-testid="stSidebar"] {
+        background-color: #11151c !important;
+        border-right: 1px solid #1e293b !important;
+    }
+    
+    /* Beautiful Custom Borders for Marketplace Container Cards */
+    div[data-testid="stVerticalBlock"] > div {
+        border-radius: 12px;
+    }
+    
+    /* Premium Action Button Global Styles */
+    .stButton>button {
+        background-color: #0284c7 !important; /* Sky Blue Base */
+        color: #ffffff !important;
+        font-weight: 600 !important;
+        border-radius: 8px !important;
+        border: none !important;
+        transition: all 0.2s ease-in-out !important;
+        width: 100% !important;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+    }
+    
+    /* Interactive Hover State for Active Buttons */
+    .stButton>button:hover {
+        background-color: #0369a1 !important; /* Deeper Cyan Highlight */
+        transform: translateY(-1px) !important;
+        box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3) !important;
+    }
+    
+    /* Horizontal Dividers Design Matrix */
+    hr {
+        border-color: #1e293b !important;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # 2. State & Memory Hub Initialization (JSON Flat-File Database Version)
 DB_INVENTORY_PATH = "inventory_db.json"
