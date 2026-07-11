@@ -206,7 +206,7 @@ if st.sidebar.button(button_label):
 st.sidebar.markdown("---")
 with st.sidebar.expander("🔗 Share QR Code and Link", expanded=False):
     # CHANGE THIS: Put your actual app link inside the quotes below
-    current_app_url = "https://yourcustomdomain.com"
+    current_app_url = "https://lattice-loop-gans4nayxjuf8vryxqhbzh.streamlit.app/"
     try:
         qr_code_generator = segno.make(current_app_url)
         
