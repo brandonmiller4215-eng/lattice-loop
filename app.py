@@ -386,8 +386,8 @@ else:
             col_img, col_details, col_actions = st.columns([1, 2, 1.5])
             
             with col_img:
-                if item.get("image"):
-                    st.image(item["image"], use_container_width=True)
+            if item.get("image"):
+    st.image(item["image"], width="stretch")    
                 else:
                     icon = "🍎" if item["category"] == "Food" else "🧵" if item["category"] == "Goods" else "🛠️" if item["category"] == "Tools" else "💼"
                     st.markdown(f"<h1 style='text-align: center; font-size: 3.5rem; margin:0;'>{icon}</h1>", unsafe_allow_html=True)
