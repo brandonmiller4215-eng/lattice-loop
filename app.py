@@ -443,22 +443,25 @@ else:
                                     timestamp = datetime.datetime.now().strftime("%H:%M")
                                     
                                     new_msg = {
-                                        "zip": user_zip,
-                                        "alias": f"Node_{user_zip}",
-                                        "text": f"🚚 SHIPPING: Label purchased for 1x '{item['item']}' from {item['seller']}. Tracking: {manifest_payload['tracking_number']}",
-                                        "time": timestamp
-                                    }
-                                    st.session_state.secure_message_wall.insert(0, new_msg)
-                                    save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
-                                    save_json_db(DB_MESSAGES_PATH, st.session_state.secure_message_wall)
-                                    
-                                    st.success("Transaction Cleared!")
-                                    st.link_button("💾 Download Shipping Label PDF", manifest_payload["label_url"])
-                                    st.rerun()
-                                else:
-                                    st.error("Out of stock!")
-                            else:
-                                st.error("Carrier Terminal Refusal: Purchase validation error.")     
+               with col_actions:
+                st.write("✨ **Checkout Framework:**")
+                trade_btn = st.button(f"🤝 Request P2P Barter", key=f"barter_{item['id']}")
+                
+                # Stripe button removed completely to clear unconfigured URL issues
+
+                # Safe structural logistics container block
+                with st.expander("🚚 Need Shipping?", expanded=False):
+                    pkg_weight = st.number_input("Package Weight (lbs):", min_value=0.5, value=1.0, step=0.5, key=f"w_{idx}")
+                    
+                    if st.button("Fetch Carrier Rates", key=f"ship_calc_{idx}"):
+                        with st.spinner("Syncing logistics lines..."):
+                            shipping_results = fetch_live_shipping_rates(item["zip"], user_zip, pkg_weight)
+                            
+                        if shipping_results["status"] == "success" and shipping_results["rates"]:
+                            st.session_state[f"cached_rates_{idx}"] = shipping_results["rates"]
+                        else:
+                            st.error("Logistical Sync Halt: Unable to resolve delivery options.")
+                    
                     cached_key = f"cached_rates_{idx}"
                     if cached_key in st.session_state:
                         options = [f"{r['carrier']} ({r['service']}) — ${r['price']:.2f} [{r['days']} Days]" for r in st.session_state[cached_key]]
@@ -475,28 +478,26 @@ else:
                                 
                             if manifest_payload:
                                 if item["qty"] > 0:
-                                    # Deduct item stock from tracking pool
                                     st.session_state.local_inventory[idx]["qty"] -= 1
                                     timestamp = datetime.datetime.now().strftime("%H:%M")
                                     
-                                    # Log formal transport creation event to active wall
                                     new_msg = {
                                         "zip": user_zip,
                                         "alias": f"Node_{user_zip}",
-                                        "text": f"🚚 SHIPPING INITIATED: Purchased label for 1x '{item['item']}' from {item['seller']}. Tracking Hash: {manifest_payload['tracking_number']}",
+                                        "text": f"🚚 SHIPPING: Purchased label for 1x '{item['item']}' from {item['seller']}. Tracking: {manifest_payload['tracking_number']}",
                                         "time": timestamp
                                     }
                                     st.session_state.secure_message_wall.insert(0, new_msg)
                                     save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
                                     save_json_db(DB_MESSAGES_PATH, st.session_state.secure_message_wall)
                                     
-                                    st.success("Transaction Cleared! Document ready below.")
+                                    st.success("Transaction Cleared!")
                                     st.link_button("💾 Download Shipping Label PDF", manifest_payload["label_url"])
                                     st.rerun()
                                 else:
                                     st.error("Out of stock!")
                             else:
-                                st.error("Carrier Terminal Refusal: Label purchase validation error.")
+                                st.error("Carrier Terminal Refusal: Purchase validation error.")
             
             if trade_btn:
                 if item["qty"] > 0:
