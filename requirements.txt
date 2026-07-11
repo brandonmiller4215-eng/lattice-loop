@@ -4,3 +4,4 @@ segno
 pgeocode
 shippo
 pandas
+numpy
