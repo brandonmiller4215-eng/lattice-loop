@@ -539,23 +539,3 @@ with st.expander("🔎 View Complete Multi-Hub Ledger Matrix", expanded=False):
     else:
         st.info("No active mutual aid allocations recorded in this session loop yet.")
         
-def purchase_carrier_label(rate_object_id):
-    """
-    Confirms an order segment, purchases postage,
-    and returns a downloadable label PDF link.
-    """
-    if not shippo_client:
-        return None
-    try:
-        transaction = shippo_client.transactions.create(
-            rate=rate_object_id,
-            async_=False
-        )
-        if transaction.get("status") == "SUCCESS":
-            return {
-                "tracking_number": transaction.get("tracking_number"),
-                "label_url": transaction.get("label_url")
-            }
-        return None
-    except:
-        return None
