@@ -386,64 +386,8 @@ else:
                 st.markdown(f"**Available Quantity:** `{item['qty']}` units")
                 st.markdown(f"💰 **Value Matrix:** `${item['price']:.2f} USD` | `{(item['price']/20.0):.2f} Hrs` | `{(item['price']/1.50):.1f} LTC`")
             
-               with col_actions:
-                st.write("✨ **Checkout Framework:**")
-                trade_btn = st.button(f"🤝 Request P2P Barter", key=f"barter_{item['id']}")
-                
-                stripe_url = f"https://stripe.com_{item['id']}" 
-                st.markdown(f"""
-                    <a href="{stripe_url}" target="_blank" style="text-decoration: none;">
-                        <button style="
-                            background-color: #15803d; 
-                            color: white; 
-                            border: none; 
-                            padding: 8px 16px; 
-                            border-radius: 8px; 
-                            font-weight: 600; 
-                            width: 100%; 
-                            cursor: pointer;
-                            margin-top: 5px;
-                            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
-                        ">💳 Pay with Card (USD)</button>
-                    </a>
-                """, unsafe_allow_html=True)
 
-                # CRASH-PROOFED LAYER: Logistical Expandable Container Block
-                with st.expander("🚚 Need Shipping?", expanded=False):
-                    pkg_weight = st.number_input("Package Weight (lbs):", min_value=0.5, value=1.0, step=0.5, key=f"w_{idx}")
-                    
-                    # Fix: Safe State Check instead of form duplication conflicts
-                    fetch_clicked = st.button("Fetch Carrier Rates", key=f"ship_calc_{idx}")
-                    
-                    if fetch_clicked:
-                        # Direct background pipeline calls prevent layout re-draw loops
-                        shipping_results = fetch_live_shipping_rates(item["zip"], user_zip, pkg_weight)
-                        if shipping_results["status"] == "success" and shipping_results["rates"]:
-                            st.session_state[f"cached_rates_{idx}"] = shipping_results["rates"]
-                        else:
-                            st.error("Logistical Sync Halt: Unable to resolve delivery options.")
-                    
-                    cached_key = f"cached_rates_{idx}"
-                    if cached_key in st.session_state:
-                        options = [f"{r['carrier']} ({r['service']}) — ${r['price']:.2f} [{r['days']} Days]" for r in st.session_state[cached_key]]
-                        selected_route = st.selectbox("Select Carrier:", options, key=f"route_select_{idx}")
-                        
-                        route_idx = options.index(selected_route)
-                        matched_rate = st.session_state[cached_key][route_idx]
-                        
-                        st.markdown(f"**Total Price + Shipping:** `${item['price'] + matched_rate['price']:.2f}`")
-                        
-                        if st.button(f"Confirm & Buy Label", key=f"buy_ship_{idx}"):
-                            with st.spinner("Generating shipping manifest..."):
-                                manifest_payload = purchase_carrier_label(matched_rate["id"])
-                                
-                            if manifest_payload:
-                                if item["qty"] > 0:
-                                    st.session_state.local_inventory[idx]["qty"] -= 1
-                                    timestamp = datetime.datetime.now().strftime("%H:%M")
-                                    
-                                    new_msg = {
-               with col_actions:
+            with col_actions:
                 st.write("✨ **Checkout Framework:**")
                 trade_btn = st.button(f"🤝 Request P2P Barter", key=f"barter_{item['id']}")
                 
