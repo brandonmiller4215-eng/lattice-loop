@@ -289,7 +289,6 @@ else:
                 st.markdown(f"**Seller:** `{item['seller']}` | {dist_str}")
                 st.markdown(f"**Available Quantity:** `{item['qty']}` units")
                 st.markdown(f"💰 **Value Matrix:** `${item['price']:.2f} USD` | `{(item['price']/20.0):.2f} Hrs` | `{(item['price']/1.50):.1f} LTC`")
-            
             with col_actions:
                 st.write("✨ **Checkout Framework:**")
                 trade_btn = st.button(f"🤝 Request P2P Barter", key=f"barter_{item['id']}")
@@ -311,6 +310,58 @@ else:
                         ">💳 Pay with Card (USD)</button>
                     </a>
                 """, unsafe_allow_html=True)
+
+                # NEW MODULE: Logistical Rate Discovery Layer
+                with st.expander("🚚 Need Shipping?", expanded=False):
+                    pkg_weight = st.number_input("Package Weight (lbs):", min_value=0.5, value=1.0, step=0.5, key=f"w_{idx}")
+                    
+                    if st.button("Fetch Carrier Rates", key=f"ship_calc_{idx}"):
+                        with st.spinner("Syncing logistics lines..."):
+                            shipping_results = fetch_live_shipping_rates(item["zip"], user_zip, pkg_weight)
+                            
+                        if shipping_results["status"] == "success" and shipping_results["rates"]:
+                            st.session_state[f"cached_rates_{idx}"] = shipping_results["rates"]
+                        else:
+                            st.error("Logistical Sync Halt: Unable to resolve delivery options.")
+                    
+                    cached_key = f"cached_rates_{idx}"
+                    if cached_key in st.session_state:
+                        options = [f"{r['carrier']} ({r['service']}) — ${r['price']:.2f} [{r['days']} Days]" for r in st.session_state[cached_key]]
+                        selected_route = st.selectbox("Select Carrier:", options, key=f"route_select_{idx}")
+                        
+                        route_idx = options.index(selected_route)
+                        matched_rate = st.session_state[cached_key][route_idx]
+                        
+                        st.markdown(f"**Total Price + Shipping:** `${item['price'] + matched_rate['price']:.2f}`")
+                        
+                        if st.button(f"Confirm & Buy Label", key=f"buy_ship_{idx}"):
+                            with st.spinner("Generating shipping manifest..."):
+                                manifest_payload = purchase_carrier_label(matched_rate["id"])
+                                
+                            if manifest_payload:
+                                if item["qty"] > 0:
+                                    # Deduct item stock from tracking pool
+                                    st.session_state.local_inventory[idx]["qty"] -= 1
+                                    timestamp = datetime.datetime.now().strftime("%H:%M")
+                                    
+                                    # Log formal transport creation event to active wall
+                                    new_msg = {
+                                        "zip": user_zip,
+                                        "alias": f"Node_{user_zip}",
+                                        "text": f"🚚 SHIPPING INITIATED: Purchased label for 1x '{item['item']}' from {item['seller']}. Tracking Hash: {manifest_payload['tracking_number']}",
+                                        "time": timestamp
+                                    }
+                                    st.session_state.secure_message_wall.insert(0, new_msg)
+                                    save_json_db(DB_INVENTORY_PATH, st.session_state.local_inventory)
+                                    save_json_db(DB_MESSAGES_PATH, st.session_state.secure_message_wall)
+                                    
+                                    st.success("Transaction Cleared! Document ready below.")
+                                    st.link_button("💾 Download Shipping Label PDF", manifest_payload["label_url"])
+                                    st.rerun()
+                                else:
+                                    st.error("Out of stock!")
+                            else:
+                                st.error("Carrier Terminal Refusal: Label purchase validation error.")
             
             if trade_btn:
                 if item["qty"] > 0:
