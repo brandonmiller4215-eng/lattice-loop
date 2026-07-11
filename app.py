@@ -146,6 +146,100 @@ def process_uploaded_image(uploaded_file):
         return f"data:image/jpeg;base64,{img_str}"
     return None
 
+# 2.6 Programmatic Shipping Integration Core
+# ==========================================
+from shippo import Shippo
+
+# Safely extract your API key from Streamlit's secrets management framework
+try:
+    shippo_token = st.secrets["SHIPPO_API_TOKEN"]
+    shippo_client = Shippo(api_key=shippo_token)
+except:
+    shippo_client = None
+
+def fetch_live_shipping_rates(from_zip, to_zip, package_weight_lbs=1.0):
+    """
+    Queries the Shippo API to retrieve valid real-time 
+    quotes and delivery windows across active carriers.
+    """
+    if not shippo_client:
+        return {"status": "error", "message": "Shippo API credentials missing. Check your secrets.toml."}
+        
+    try:
+        # Mock addresses required for carrier routing (requires real addresses in production)
+        address_from = {
+            "name": "Lattice Vendor Node",
+            "street1": "123 Hub St",
+            "city": "Anytown",
+            "state": "NY",
+            "zip": from_zip,
+            "country": "US"
+        }
+        
+        address_to = {
+            "name": "Lattice Buyer Node",
+            "street1": "456 Delivery Line",
+            "city": "Metropolis",
+            "state": "CA",
+            "zip": to_zip,
+            "country": "US"
+        }
+        
+        parcel = {
+            "length": "10",
+            "width": "7",
+            "height": "4",
+            "distance_unit": "in",
+            "weight": str(package_weight_lbs),
+            "mass_unit": "lb"
+        }
+        
+        # Instantiate shipping request array constructs
+        shipment = shippo_client.shipments.create(
+            address_from=address_from,
+            address_to=address_to,
+            parcels=[parcel],
+            async_=False
+        )
+        
+        rates_list = shipment.get("rates", [])
+        formatted_rates = []
+        
+        for rate in rates_list:
+            formatted_rates.append({
+                "id": rate.get("object_id"),
+                "carrier": rate.get("provider"),
+                "service": rate.get("servicelevel", {}).get("name"),
+                "price": float(rate.get("amount")),
+                "days": rate.get("estimated_days")
+            })
+            
+        return {"status": "success", "rates": sorted(formatted_rates, key=lambda x: x["price"])}
+        
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
+def purchase_carrier_label(rate_object_id):
+    """
+    Confirms an order segment, purchases postage,
+    and returns a downloadable label PDF link.
+    """
+    if not shippo_client:
+        return None
+    try:
+        transaction = shippo_client.transactions.create(
+            rate=rate_object_id,
+            async_=False
+        )
+        if transaction.get("status") == "SUCCESS":
+            return {
+                "tracking_number": transaction.get("tracking_number"),
+                "label_url": transaction.get("label_url")
+            }
+        return None
+    except:
+        return None
+
 # ==========================================
 # 3. MAIN INTERFACE HEADER
 # ==========================================
