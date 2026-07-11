@@ -353,7 +353,6 @@ st.sidebar.markdown(f"""
 st.subheader("📍 Your Location")
 col_zip1, col_zip2 = st.columns(2)
 with col_zip1:
-    # Changed generic placeholder default state entry from 78201 to 10001
     user_zip = st.text_input("Enter Your ZIP Code:", value="10001", max_chars=5, key="global_zip")
 
 with col_zip2:
@@ -370,12 +369,12 @@ else:
         distance = calculate_distance(user_zip, item["zip"])
         dist_str = f"📍 {distance} miles away" if isinstance(distance, (int, float)) else f"🛑 {distance}"
         
-        with st.container():
+        with st.container(border=True):
             col_img, col_details, col_actions = st.columns([1, 2, 1.5])
             
             with col_img:
                 if item.get("image"):
-                    st.image(item["image"], use_column_width=True)
+                    st.image(item["image"], use_container_width=True)
                 else:
                     icon = "🍎" if item["category"] == "Food" else "🧵" if item["category"] == "Goods" else "🛠️" if item["category"] == "Tools" else "💼"
                     st.markdown(f"<h1 style='text-align: center; font-size: 3.5rem; margin:0;'>{icon}</h1>", unsafe_allow_html=True)
@@ -386,14 +385,11 @@ else:
                 st.markdown(f"**Available Quantity:** `{item['qty']}` units")
                 st.markdown(f"💰 **Value Matrix:** `${item['price']:.2f} USD` | `{(item['price']/20.0):.2f} Hrs` | `{(item['price']/1.50):.1f} LTC`")
             
-
             with col_actions:
                 st.write("✨ **Checkout Framework:**")
                 trade_btn = st.button(f"🤝 Request P2P Barter", key=f"barter_{item['id']}")
                 
-                # Stripe button removed completely to clear unconfigured URL issues
-
-                # Safe structural logistics container block
+                # Integrated Shippo Shipping Calculator Container Block
                 with st.expander("🚚 Need Shipping?", expanded=False):
                     pkg_weight = st.number_input("Package Weight (lbs):", min_value=0.5, value=1.0, step=0.5, key=f"w_{idx}")
                     
