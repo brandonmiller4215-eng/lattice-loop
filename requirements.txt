@@ -3,5 +3,4 @@ Pillow
 segno
 pgeocode
 shippo
-
 numpy
