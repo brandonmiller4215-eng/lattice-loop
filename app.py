@@ -205,13 +205,24 @@ if st.sidebar.button(button_label):
 # Dedicated Sidebar Dropdown container holding QR code link and system attributions
 st.sidebar.markdown("---")
 with st.sidebar.expander("🔗 Share QR Code and Link", expanded=False):
-    current_app_url = "https://streamlit.app"
+    # CHANGE THIS: Put your actual app link inside the quotes below
+    current_app_url = "https://yourcustomdomain.com"
     try:
         qr_code_generator = segno.make(current_app_url)
+        
+        # Stream output into memory buffer to prevent local file generation overhead
         qr_buffer = io.BytesIO()
-        qr_code_generator.save(qr_buffer, kind="png", scale=4, dark="#15803d", light="#f3f4f1")
-        qr_buffer.seek(0)
-        qr_b64 = base64.b64encode(qr_buffer.getvalue()).decode()
+        qr_code_generator.save(qr_buffer, kind='png', scale=4)
+        
+        # Display the visual matrix network assets
+        st.image(
+            qr_buffer.getvalue(), 
+            caption="Scan code matrix to sync into this local node pool network.", 
+            use_container_width=True
+        )
+        st.code(current_app_url, language="text")
+    except Exception as network_error:
+        st.sidebar.error("Cryptographic Link Error: Could not generate network link QR code metadata.")
         
         st.markdown(f'<div style="text-align: center;"><img src="data:image/png;base64,{qr_b64}" width="140" style="border-radius:8px; border: 1px solid #e2e4df;"></div>', unsafe_allow_html=True)
         st.markdown(f"""
